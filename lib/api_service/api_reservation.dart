@@ -1,43 +1,44 @@
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:dio/dio.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:flutter/material.dart';
 
 class ReservationController extends GetxController {
   static const String baseUrl = "http://192.168.1.102:8000/api";
 
+  final Dio dio = Dio();
+  final box = GetStorage();
+
   var isLoading = false.obs;
   var tables = <Map<String, dynamic>>[].obs;
 
-  Future<String?> getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('access_token');
+  String? getToken() {
+    return box.read("access_token");
   }
 
   /// دالة جلب الحجوزات لطاولة معيّنة باستخدام endpoint showtimeReserv/{id}
   Future<void> fetchTableReservations(int tableId) async {
     try {
       isLoading.value = true;
-      final token = await getToken();
+      final token = getToken();
 
       if (token == null || token.isEmpty) {
         Get.snackbar("تنبيه", "الرجاء تسجيل الدخول أولاً", backgroundColor: Colors.orange);
         return;
       }
 
-      final response = await http.get(
-        Uri.parse("$baseUrl/showtimeReserv/$tableId"),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-        },
+      final response = await dio.get(
+        "$baseUrl/showtimeReserv/$tableId",
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
+        ),
       );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final list = data['message'];
-
+        final list = response.data['message'];
         if (list is List) {
           tables.value = List<Map<String, dynamic>>.from(list);
         } else {
@@ -60,24 +61,26 @@ class ReservationController extends GetxController {
   Future<void> reserveTable(int tableId, Map<String, dynamic> data) async {
     try {
       isLoading.value = true;
-      final token = await getToken();
+      final token = getToken();
 
       if (token == null || token.isEmpty) {
         Get.snackbar("تنبيه", "الرجاء تسجيل الدخول أولاً", backgroundColor: Colors.orange);
         return;
       }
 
-      final response = await http.post(
-        Uri.parse("$baseUrl/reserve/$tableId"),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(data),
+      final response = await dio.post(
+        "$baseUrl/reserve/$tableId",
+        data: data,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+        ),
       );
 
-      final result = jsonDecode(response.body);
+      final result = response.data;
 
       if (response.statusCode == 200) {
         Get.snackbar("نجاح", result['message'] ?? 'تم الحجز بنجاح', backgroundColor: Colors.green);

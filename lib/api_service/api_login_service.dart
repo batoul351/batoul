@@ -1,46 +1,47 @@
-import 'dart:convert';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
+import 'package:get_storage/get_storage.dart';
 import '../screen/Parts.dart';
 
 class LoginController extends GetxController {
   static const String baseUrl = "http://192.168.1.102:8000/api";
+  final Dio dio = Dio();
+  final box = GetStorage();
 
   var isLoading = false.obs;
   var loginMessage = "".obs;
 
-  Future<void> saveToken(String token) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('access_token', token);
-  }
-
   Future<void> login({required String email, required String password}) async {
-    final url = Uri.parse("$baseUrl/login");
+    final String url = "$baseUrl/login";
 
     try {
       isLoading.value = true;
 
-      final response = await http.post(
+      final response = await dio.post(
         url,
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: jsonEncode({
+        data: {
           "email": email,
           "password": password,
-        }),
+        },
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+          },
+        ),
       );
 
       isLoading.value = false;
 
       if (response.statusCode == 201) {
-        final responseData = jsonDecode(response.body);
+        final responseData = response.data;
 
         if (responseData.containsKey("token")) {
           String token = responseData["token"];
-          await saveToken(token);
+
+          // تخزين التوكن والبريد الإلكتروني في GetStorage
+          box.write("access_token", token);
+          box.write("userEmail", email);
 
           loginMessage.value = "تم تسجيل الدخول بنجاح!";
           Get.snackbar("نجاح", loginMessage.value, backgroundColor: Get.theme.primaryColor);
@@ -51,7 +52,7 @@ class LoginController extends GetxController {
       } else if (response.statusCode == 401) {
         loginMessage.value = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
       } else {
-        loginMessage.value = "خطأ غير متوقع: ${response.body}";
+        loginMessage.value = "خطأ غير متوقع: ${response.data}";
       }
     } catch (error) {
       isLoading.value = false;

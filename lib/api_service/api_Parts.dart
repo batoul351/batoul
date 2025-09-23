@@ -1,40 +1,39 @@
 import 'package:get/get.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:flutter/material.dart';
 
 class CategoryController extends GetxController {
   static const String baseUrl = "http://192.168.1.102:8000/api";
+  final Dio dio = Dio();
+  final box = GetStorage();
 
   var categories = <Map<String, dynamic>>[].obs;
   var isLoading = false.obs;
 
-  Future<String?> getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('access_token');
-  }
-
   void fetchCategories() async {
     isLoading.value = true;
+
     try {
-      final token = await getToken();
+      final token = box.read("access_token");
       if (token == null || token.isEmpty) {
         Get.snackbar("خطأ", "يرجى تسجيل الدخول أولاً للحصول على البيانات", backgroundColor: Colors.orange);
         isLoading.value = false;
         return;
       }
 
-      final response = await http.get(
-        Uri.parse("$baseUrl/getParts"),
-        headers: {
-          "Accept": "application/json",
-          "Authorization": "Bearer $token"
-        },
+      final response = await dio.get(
+        "$baseUrl/getParts",
+        options: Options(
+          headers: {
+            "Accept": "application/json",
+            "Authorization": "Bearer $token",
+          },
+        ),
       );
 
       if (response.statusCode == 200) {
-        var decodedData = jsonDecode(response.body);
+        final decodedData = response.data;
 
         if (decodedData is List && decodedData.isNotEmpty) {
           categories.value = List<Map<String, dynamic>>.from(decodedData);
@@ -49,6 +48,7 @@ class CategoryController extends GetxController {
     } catch (e) {
       Get.snackbar("خطأ", "خطأ في الاتصال بالسيرفر: $e", backgroundColor: Colors.red);
     }
+
     isLoading.value = false;
   }
 }

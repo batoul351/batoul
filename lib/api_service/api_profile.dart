@@ -1,19 +1,24 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart' as dio; // استخدام alias لتفادي التضارب
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get_storage/get_storage.dart';
 
 class ProfileController extends GetxController {
+  // عناصر الإدخال
   final cityController = TextEditingController();
   final streetController = TextEditingController();
   final phoneController = TextEditingController();
 
+  // الحالة
   final imagePath = ''.obs;
   final imageFile = Rxn<File>();
   final hasProfile = false.obs;
+
+  // الأدوات
+  final dio.Dio dioClient = dio.Dio();
+  final box = GetStorage();
 
   @override
   void onInit() {
@@ -21,6 +26,7 @@ class ProfileController extends GetxController {
     fetchProfile();
   }
 
+  // اختيار صورة من المعرض
   void pickImage() async {
     final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (picked != null) {
@@ -29,67 +35,94 @@ class ProfileController extends GetxController {
     }
   }
 
+  // استرجاع التوكن من التخزين
+  String? getToken() {
+    return box.read("access_token");
+  }
+
+  // إرسال الملف الشخصي
   Future<void> submitProfile() async {
     if (hasProfile.value) {
-      Get.snackbar('Profile Exists', 'You already have a profile.');
+      Get.snackbar('موجود', 'لديك ملف شخصي بالفعل');
       return;
     }
 
-    final token = await getToken();
-    if (token == null) {
-      Get.snackbar('Token Error', 'Authentication token not found');
+    final token = getToken();
+    if (token == null || token.isEmpty) {
+      Get.snackbar('توكن مفقود', 'يرجى تسجيل الدخول أولاً');
       return;
     }
 
-    final request = http.MultipartRequest(
-      'POST',
-      Uri.parse('http://192.168.1.102:8000/api/profile'),
-    );
-
-    request.headers['Authorization'] = 'Bearer $token';
-    request.fields['city'] = cityController.text;
-    request.fields['street'] = streetController.text;
-    request.fields['phone'] = phoneController.text;
-    request.files.add(await http.MultipartFile.fromPath('image', imageFile.value!.path));
-
-    final response = await request.send();
-
-    if (response.statusCode == 200) {
-      Get.snackbar('Success', 'Profile created successfully');
-      fetchProfile();
-    } else if (response.statusCode == 409) {
-      hasProfile.value = true;
-      Get.snackbar('Exists', 'Profile already exists');
-    } else {
-      Get.snackbar('Error', 'Failed to create profile');
+    if (imageFile.value == null || !await imageFile.value!.exists()) {
+      Get.snackbar('الصورة مطلوبة', 'يرجى اختيار صورة صالحة قبل الإرسال');
+      return;
     }
-  }
 
-  Future<void> fetchProfile() async {
-    final token = await getToken();
-    if (token == null) return;
+    try {
+      final formData = dio.FormData.fromMap({
+        'city': cityController.text,
+        'street': streetController.text,
+        'phone': phoneController.text,
+        'image': await dio.MultipartFile.fromFile(
+          imageFile.value!.path,
+          filename: imageFile.value!.path.split('/').last,
+        ),
+      });
 
-    final response = await http.get(
-      Uri.parse('http://192.168.1.102:8000/api/getProfile'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
+      final response = await dioClient.post(
+        'http://192.168.1.102:8000/api/profile',
+        data: formData,
+        options: dio.Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
+      );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      if (data['message'] != null && data['message'].isNotEmpty) {
-        final profile = data['message'][0];
-        cityController.text = profile['city'] ?? '';
-        streetController.text = profile['street'] ?? '';
-        phoneController.text = profile['phone'].toString();
-        imagePath.value = 'http://192.168.1.102:8000/' + profile['image'];
-        imageFile.value = null;
+      if (response.statusCode == 200) {
+        Get.snackbar('نجاح', 'تم إنشاء الملف الشخصي بنجاح');
+        fetchProfile();
+      } else if (response.statusCode == 409) {
         hasProfile.value = true;
+        Get.snackbar('موجود مسبقًا', 'الملف الشخصي موجود بالفعل');
+      } else {
+        Get.snackbar('فشل', 'تعذر إنشاء الملف الشخصي: ${response.statusCode}');
       }
+    } catch (e) {
+      Get.snackbar('خطأ', 'حدث خطأ أثناء إرسال البيانات: $e');
     }
   }
 
-  Future<String?> getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('access_token');
+  // جلب الملف الشخصي من السيرفر
+  Future<void> fetchProfile() async {
+    final token = getToken();
+    if (token == null || token.isEmpty) return;
+
+    try {
+      final response = await dioClient.get(
+        'http://192.168.1.102:8000/api/getProfile',
+        options: dio.Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data['message'] != null && data['message'].isNotEmpty) {
+          final profile = data['message'][0];
+          cityController.text = profile['city'] ?? '';
+          streetController.text = profile['street'] ?? '';
+          phoneController.text = profile['phone'].toString();
+          imagePath.value = 'http://192.168.1.102:8000/' + profile['image'];
+          imageFile.value = null;
+          hasProfile.value = true;
+        }
+      }
+    } catch (e) {
+      Get.snackbar('خطأ', 'تعذر جلب الملف الشخصي: $e');
+    }
   }
 }

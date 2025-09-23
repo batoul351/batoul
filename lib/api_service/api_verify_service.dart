@@ -1,43 +1,52 @@
-import 'dart:convert';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
+import 'package:get_storage/get_storage.dart';
 import '../screen/Parts.dart';
 
 class VerifyAccountController extends GetxController {
   static const String baseUrl = "http://192.168.1.102:8000/api";
+  final Dio dio = Dio();
+  final box = GetStorage();
 
   var isLoading = false.obs;
   var verificationMessage = "".obs;
 
   Future<void> verifyAccount({required String email, required String code}) async {
     const String endpoint = "/verification_signup";
-    final url = Uri.parse(baseUrl + endpoint);
+    final String url = baseUrl + endpoint;
 
     try {
       isLoading.value = true;
 
-      final response = await http.post(
+      final response = await dio.post(
         url,
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: jsonEncode({
+        data: {
           "email": email,
           "code": code,
-        }),
+        },
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+          },
+        ),
       );
 
       isLoading.value = false;
 
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        verificationMessage.value = responseData["message"] ?? "Verification successful.";
+        final responseData = response.data;
+        verificationMessage.value = responseData["message"] ?? "تم التحقق بنجاح.";
+
+        // تخزين البيانات في GetStorage
+        box.write("isVerified", true);
+        box.write("userEmail", email);
+
         Get.snackbar("نجاح", verificationMessage.value, backgroundColor: Get.theme.primaryColor);
-        Get.offAll(() => WelcomePage()); 
+        Get.offAll(() => WelcomePage());
       } else {
-        final responseData = jsonDecode(response.body);
-        verificationMessage.value = responseData["message"] ?? "Verification failed.";
+        final responseData = response.data;
+        verificationMessage.value = responseData["message"] ?? "فشل التحقق.";
       }
     } catch (error) {
       isLoading.value = false;
