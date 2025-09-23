@@ -1,16 +1,39 @@
-# nour
+# 🍽️ Restaurant App
 
-A new Flutter project.
+Welcome to my restaurant app — a full-featured mobile interface connected to a Laravel backend. Built with **GetX**, **HTTP**, and **SharedPreferences**, this project delivers a smooth and responsive user experience.
 
-## Getting Started
+## 🔧 Technologies Used
+- **GetX** – Efficient state management and navigation across the app.
+- **HTTP** – Handles API communication with the Laravel backend.
+- **SharedPreferences** – Stores user data locally for persistent sessions.
 
-This project is a starting point for a Flutter application.
+## 📱 App Features
 
-A few resources to get you started if this is your first Flutter project:
+- **Email Sign-Up with Verification**  
+  Users can create an account and verify it via a code sent to their email.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Login Screen**  
+  Secure login with saved credentials and session management.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- **User Profile**  
+  View and edit personal information with real-time updates.
+
+- **Browse Categories & Meals**  
+  Fetch and display food categories and their respective meals dynamically.
+
+- **Rate Meals After Ordering**  
+  Users can leave feedback and ratings for meals they’ve tried.
+
+- **Table Reservation**  
+  Book a table directly from the app with preferred time and date.
+
+- **Call the Restaurant**  
+  One-tap phone call feature to contact the restaurant instantly.
+
+- **Offers & Discounts**  
+  Display current promotions and discounted meals to boost engagement.
+
+---
+
+Feel free to explore the code, suggest improvements, or fork the project.  
+Let’s build delicious experiences together! 😋
