@@ -38,7 +38,6 @@ class VerifyAccountController extends GetxController {
         final responseData = response.data;
         verificationMessage.value = responseData["message"] ?? "تم التحقق بنجاح.";
 
-        // تخزين البيانات في GetStorage
         box.write("isVerified", true);
         box.write("userEmail", email);
 

@@ -16,7 +16,6 @@ class ReservationController extends GetxController {
     return box.read("access_token");
   }
 
-  /// دالة جلب الحجوزات لطاولة معيّنة باستخدام endpoint showtimeReserv/{id}
   Future<void> fetchTableReservations(int tableId) async {
     try {
       isLoading.value = true;
@@ -57,7 +56,6 @@ class ReservationController extends GetxController {
     }
   }
 
-  /// دالة تنفيذ الحجز لطاولة معيّنة
   Future<void> reserveTable(int tableId, Map<String, dynamic> data) async {
     try {
       isLoading.value = true;

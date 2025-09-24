@@ -39,7 +39,6 @@ class LoginController extends GetxController {
         if (responseData.containsKey("token")) {
           String token = responseData["token"];
 
-          // تخزين التوكن والبريد الإلكتروني في GetStorage
           box.write("access_token", token);
           box.write("userEmail", email);
 

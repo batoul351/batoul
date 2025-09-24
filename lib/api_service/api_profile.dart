@@ -1,22 +1,19 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:dio/dio.dart' as dio; // استخدام alias لتفادي التضارب
+import 'package:dio/dio.dart' as dio; 
 import 'package:image_picker/image_picker.dart';
 import 'package:get_storage/get_storage.dart';
 
 class ProfileController extends GetxController {
-  // عناصر الإدخال
   final cityController = TextEditingController();
   final streetController = TextEditingController();
   final phoneController = TextEditingController();
 
-  // الحالة
   final imagePath = ''.obs;
   final imageFile = Rxn<File>();
   final hasProfile = false.obs;
 
-  // الأدوات
   final dio.Dio dioClient = dio.Dio();
   final box = GetStorage();
 
@@ -26,7 +23,6 @@ class ProfileController extends GetxController {
     fetchProfile();
   }
 
-  // اختيار صورة من المعرض
   void pickImage() async {
     final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (picked != null) {
@@ -35,12 +31,10 @@ class ProfileController extends GetxController {
     }
   }
 
-  // استرجاع التوكن من التخزين
   String? getToken() {
     return box.read("access_token");
   }
 
-  // إرسال الملف الشخصي
   Future<void> submitProfile() async {
     if (hasProfile.value) {
       Get.snackbar('موجود', 'لديك ملف شخصي بالفعل');
@@ -94,7 +88,6 @@ class ProfileController extends GetxController {
     }
   }
 
-  // جلب الملف الشخصي من السيرفر
   Future<void> fetchProfile() async {
     final token = getToken();
     if (token == null || token.isEmpty) return;
