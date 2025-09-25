@@ -64,7 +64,7 @@ class ProfileController extends GetxController {
       });
 
       final response = await dioClient.post(
-        'http://192.168.1.102:8000/api/profile',
+        'http://192.168.1.105:8000/api/profile',
         data: formData,
         options: dio.Options(
           headers: {
@@ -94,7 +94,7 @@ class ProfileController extends GetxController {
 
     try {
       final response = await dioClient.get(
-        'http://192.168.1.102:8000/api/getProfile',
+        'http://192.168.1.105:8000/api/getProfile',
         options: dio.Options(
           headers: {
             'Authorization': 'Bearer $token',
@@ -109,7 +109,7 @@ class ProfileController extends GetxController {
           cityController.text = profile['city'] ?? '';
           streetController.text = profile['street'] ?? '';
           phoneController.text = profile['phone'].toString();
-          imagePath.value = 'http://192.168.1.102:8000/' + profile['image'];
+          imagePath.value = 'http://192.168.1.105:8000/' + profile['image'];
           imageFile.value = null;
           hasProfile.value = true;
         }

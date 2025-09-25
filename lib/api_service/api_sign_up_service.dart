@@ -6,7 +6,7 @@ import '../screen/VerifyAccountPage .dart';
 import 'api_Parts.dart';
 
 class SignUpController extends GetxController {
-  static const String baseUrl = "http://192.168.1.102:8000/api";
+  static const String baseUrl = "http://192.168.1.105:8000/api";
   var isLoading = false.obs;
   var signUpMessage = "".obs;
 

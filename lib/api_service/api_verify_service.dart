@@ -4,7 +4,7 @@ import 'package:get_storage/get_storage.dart';
 import '../screen/Parts.dart';
 
 class VerifyAccountController extends GetxController {
-  static const String baseUrl = "http://192.168.1.102:8000/api";
+  static const String baseUrl = "http://192.168.1.105:8000/api";
   final Dio dio = Dio();
   final box = GetStorage();
 
