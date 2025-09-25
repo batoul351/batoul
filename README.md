@@ -4,9 +4,11 @@ Welcome to my restaurant app — a full-featured mobile interface connected to a
 
 ## 🔧 Technologies Used
 - **GetX** – Efficient state management and navigation across the app.
-- **HTTP** – Handles API communication with the Laravel backend.
-- **SharedPreferences** – Stores user data locally for persistent sessions.
 
+- **Dio** – Handles API communication with the Laravel backend, offering advanced features like interceptors, custom headers, and robust error handling.
+
+- **GetStorage** – Lightweight and fast local storage solution used to persist user data and session state across app launches.
+  
 ## 📱 App Features
 
 - **Email Sign-Up with Verification**  
