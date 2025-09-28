@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../api_service/api_favorite.dart';
+import '../Controller/favorite_controller.dart';
 
-class FavoriteScreen extends StatelessWidget {
+class FavoritePage extends StatelessWidget {
   final FavoriteController favoriteController = Get.put(FavoriteController());
 
   @override
@@ -11,7 +11,7 @@ class FavoriteScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(" Favorites", style: TextStyle(fontSize: 24)),
+        title: const Text("المفضلة", style: TextStyle(fontSize: 24)),
         backgroundColor: const Color(0xFFE2B09E),
         centerTitle: true,
         elevation: 4,
@@ -19,7 +19,7 @@ class FavoriteScreen extends StatelessWidget {
       body: Obx(() {
         if (favoriteController.favoriteItems.isEmpty) {
           return const Center(
-            child: Text("No favorite items found",
+            child: Text("لا توجد عناصر مفضلة",
                 style: TextStyle(fontSize: 20, color: Colors.grey)),
           );
         }
@@ -29,7 +29,6 @@ class FavoriteScreen extends StatelessWidget {
           itemCount: favoriteController.favoriteItems.length,
           itemBuilder: (context, index) {
             final item = favoriteController.favoriteItems[index];
-            final foodId = item['food_id'];
 
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
@@ -44,12 +43,12 @@ class FavoriteScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Meal ID: $foodId",
+                  Text("Meal ID: ${item.foodId}",
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   IconButton(
                     icon: const Icon(Icons.delete, color: Colors.redAccent),
                     onPressed: () {
-                      favoriteController.deleteFavorite(foodId);
+                      favoriteController.deleteFavorite(item.foodId);
                     },
                   ),
                 ],

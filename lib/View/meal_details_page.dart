@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import '../api_service/api_Meals.dart';
-
+import '../Controller/meal_controller.dart';
 class MealDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> meal;
 

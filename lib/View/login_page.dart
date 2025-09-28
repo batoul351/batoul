@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../api_service/api_login_service.dart';
-import '../screen/forgetPassword.dart';
+import '../Controller/login_controller.dart';
+import '../View/ForgotPasswordPage.dart';
 
 class LoginPage extends StatelessWidget {
   final LoginController loginController = Get.put(LoginController());
-
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
   final baseColor = const Color.fromARGB(255, 235, 200, 190);
 
   @override
@@ -19,25 +17,25 @@ class LoginPage extends StatelessWidget {
         backgroundColor: baseColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () => Get.back(),
         ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 40),
+        padding: const EdgeInsets.symmetric(horizontal: 40),
         child: Column(
           children: [
-            SizedBox(height: 20), // ← تم تقليل المسافة قليلاً
+            const SizedBox(height: 20),
             _buildProfileIcon(context),
-            SizedBox(height: 16),
-            Text("Log In", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white)),
-            SizedBox(height: 24),
+            const SizedBox(height: 16),
+            const Text("Log In", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white)),
+            const SizedBox(height: 24),
             buildTextField("Email", emailController),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             buildTextField("Password", passwordController, obscureText: true),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Obx(() => loginController.isLoading.value
-                ? CircularProgressIndicator()
+                ? const CircularProgressIndicator()
                 : MaterialButton(
                     onPressed: () {
                       final email = emailController.text.trim();
@@ -50,24 +48,23 @@ class LoginPage extends StatelessWidget {
                     },
                     color: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-                    child: Text("Log In", style: TextStyle(color: baseColor, fontSize: 18, fontWeight: FontWeight.bold)),
+                    child: const Text("Log In", style: TextStyle(color: Color.fromARGB(255, 235, 200, 190), fontSize: 18, fontWeight: FontWeight.bold)),
                   )),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             MaterialButton(
               onPressed: () => Get.to(() => ForgotPasswordPage()),
               color: baseColor,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-              child: Text("Forgot Password?", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              child: const Text("Forgot Password?", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
             ),
-            SizedBox(height: 20),
-            Obx(() => Text(loginController.loginMessage.value, style: TextStyle(color: Colors.red))),
+            const SizedBox(height: 20),
+            Obx(() => Text(loginController.loginMessage.value, style: const TextStyle(color: Colors.red))),
           ],
         ),
       ),
     );
   }
 
-  // ⭐ أيقونة داخل دائرة بظل بسيط
   Widget _buildProfileIcon(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.2,
@@ -75,19 +72,11 @@ class LoginPage extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white.withOpacity(0.1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10,
-            offset: Offset(0, 6),
-          ),
+        boxShadow: const [
+          BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 6)),
         ],
       ),
-      child: Icon(
-        Icons.person,
-        size: MediaQuery.of(context).size.height * 0.12,
-        color: Colors.white,
-      ),
+      child: Icon(Icons.person, size: MediaQuery.of(context).size.height * 0.12, color: Colors.white),
     );
   }
 
@@ -95,12 +84,12 @@ class LoginPage extends StatelessWidget {
     return TextField(
       controller: controller,
       obscureText: obscureText,
-      style: TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Colors.white),
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
-        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 2)),
+        labelStyle: const TextStyle(color: Colors.white),
+        enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+        focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 2)),
       ),
     );
   }

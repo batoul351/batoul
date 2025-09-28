@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../api_service/api_Meals.dart';
-import '../api_service/api_favorite.dart'; 
-import 'meal_details_screen.dart';
+import '../Controller/meal_controller.dart';
+import '../Controller/favorite_controller.dart';
+import '../Model/meal_model.dart';
+import 'meal_details_page.dart';
 
 class MealsPage extends StatelessWidget {
   final int categoryId;
   final String categoryName;
+  
   final MealController mealController = Get.put(MealController());
   final FavoriteController favoriteController = Get.put(FavoriteController());
 
@@ -29,7 +31,7 @@ class MealsPage extends StatelessWidget {
 
         if (mealController.meals.isEmpty) {
           return const Center(
-            child: Text("⚠ No meals available",
+            child: Text(" لا توجد وجبات متاحة",
                 style: TextStyle(fontSize: 20, color: Colors.red)),
           );
         }
@@ -46,7 +48,7 @@ class MealsPage extends StatelessWidget {
                 leading: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
-                    meal['image'],
+                    meal.image,
                     width: 80,
                     height: 80,
                     fit: BoxFit.cover,
@@ -55,39 +57,25 @@ class MealsPage extends StatelessWidget {
                             size: 50, color: Colors.red),
                   ),
                 ),
-                title: Text(meal['name'],
+                title: Text(meal.name,
                     style: const TextStyle(fontSize: 20, color: Colors.white)),
                 subtitle: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("${meal['price']} SYP",
+                    Text("${meal.price} SYP",
                         style: const TextStyle(
                             fontSize: 18, color: Colors.white70)),
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.favorite_border,
-                              color: Colors.white),
-                          onPressed: () {
-                            favoriteController.addToFavorite(meal['id']);
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.shopping_cart_outlined,
-                              color: Colors.white),
-                          onPressed: () {
-                            Get.snackbar("Cart",
-                                "${meal['name']} added to cart",
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor: Colors.green,
-                                colorText: Colors.white);
-                          },
-                        ),
-                      ],
+                    IconButton(
+                      icon: const Icon(Icons.favorite_border,
+                          color: Colors.white),
+                      onPressed: () {
+                        favoriteController.addToFavorite(meal.id);
+                      },
                     ),
                   ],
                 ),
-                onTap: () => Get.to(() => MealDetailsScreen(meal: meal)),
+onTap: () => Get.to(() => MealDetailsScreen(meal: meal.toJson())),
+
               ),
             );
           },

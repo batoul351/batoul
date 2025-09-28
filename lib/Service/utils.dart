@@ -5,6 +5,6 @@ Future<void> callRestaurant(String phoneNumber) async {
   if (await canLaunchUrl(phoneUri)) {
     await launchUrl(phoneUri);
   } else {
-    print("⚠️ لا يمكن إجراء الاتصال");
+    print(" لا يمكن إجراء الاتصال");
   }
 }

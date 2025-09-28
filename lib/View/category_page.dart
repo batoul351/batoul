@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../api_service/api_Parts.dart';
-import '../screen/meals.dart';
-import '../screen/HomeReservationPage.dart';
-import '../screen/profile.dart';
-import '../screen/favorite_screen.dart';
+import '../Controller/category_controller.dart';
+import '../Model/category_model.dart';
+import 'meals_page.dart';
+import 'profile_page.dart';
+import 'favorite_page.dart';
+import 'reservation_page.dart';
 
 class WelcomePage extends StatefulWidget {
   @override
-  _WelcomePageState createState() => _WelcomePageState();
+  State<WelcomePage> createState() => _WelcomePageState();
 }
 
 class _WelcomePageState extends State<WelcomePage> {
@@ -27,22 +28,46 @@ class _WelcomePageState extends State<WelcomePage> {
     if (await canLaunchUrl(phoneUri)) {
       await launchUrl(phoneUri);
     } else {
-      Get.snackbar("Error", "⚠️ Unable to make the call", backgroundColor: Colors.red);
+      Get.snackbar("خطأ", " لا يمكن إجراء المكالمة", backgroundColor: Colors.red);
     }
   }
 
   void _onItemTapped(int index) {
-    if (index == 5) {
-      Get.to(() => ReservationDashboard());
-    } else if (index == 1) {
-      Get.to(() => ProfileScreen());
-    } else if (index == 2) {
-      Get.to(() => FavoriteScreen()); // ✅ الانتقال إلى صفحة المفضلة
-    } else {
-      setState(() {
-        _selectedIndex = index;
-      });
+    switch (index) {
+      case 1:
+        Get.to(() => ProfilePage());
+        break;
+      case 2:
+        Get.to(() => FavoritePage());
+        break;
+      case 4:
+        Get.to(() => ReservationPage());
+        break;
+      default:
+        setState(() {
+          _selectedIndex = index;
+        });
     }
+  }
+
+  Widget buildCategoryItem(CategoryModel category) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      color: Colors.white,
+      elevation: 4,
+      child: ListTile(
+        leading: const Icon(Icons.restaurant_menu,
+            color: Color.fromARGB(255, 226, 176, 158), size: 30),
+        title: Text(
+          category.name,
+          style: const TextStyle(
+              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 18),
+        onTap: () => Get.to(() => MealsPage(
+            categoryId: category.id, categoryName: category.name)),
+      ),
+    );
   }
 
   @override
@@ -82,12 +107,13 @@ class _WelcomePageState extends State<WelcomePage> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (categoryController.categories.isEmpty) {
-                  return const Center(child: Text("No categories available."));
+                  return const Center(child: Text("لا توجد فئات متاحة."));
                 }
                 return ListView.builder(
                   itemCount: categoryController.categories.length,
                   itemBuilder: (context, index) {
-                    return buildCategoryItem(categoryController.categories[index]);
+                    final category = categoryController.categories[index];
+                    return buildCategoryItem(category);
                   },
                 );
               }),
@@ -99,42 +125,22 @@ class _WelcomePageState extends State<WelcomePage> {
         onPressed: () => callRestaurant("0983901162"),
         backgroundColor: Colors.green,
         child: const Icon(Icons.phone, color: Colors.white),
-        tooltip: "Call the restaurant",
+        tooltip: "اتصل بالمطعم",
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: "Favourite"),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: "Cart"),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: "Favorites"),
           BottomNavigationBarItem(icon: Icon(Icons.notifications), label: "Notifications"),
-          BottomNavigationBarItem(icon: Icon(Icons.event_seat), label: "Reservations"),
+          BottomNavigationBarItem(icon: Icon(Icons.event_seat), label: "Bookings"),
+
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blueAccent,
         unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
-      ),
-    );
-  }
-
-  Widget buildCategoryItem(Map<String, dynamic> category) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      color: Colors.white,
-      elevation: 4,
-      child: ListTile(
-        leading: const Icon(Icons.restaurant_menu,
-            color: Color.fromARGB(255, 226, 176, 158), size: 30),
-        title: Text(
-          category['name'] ?? "Unavailable",
-          style: const TextStyle(
-              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
-        ),
-        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 18),
-        onTap: () => Get.to(() => MealsPage(
-            categoryId: category["id"], categoryName: category["name"])),
       ),
     );
   }

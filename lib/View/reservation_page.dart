@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../api_service/api_reservation.dart';
+import '../Controller/reservation_controller.dart';
 
-class ReservationDashboard extends StatefulWidget {
+class ReservationPage extends StatefulWidget {
   @override
-  State<ReservationDashboard> createState() => _ReservationDashboardState();
+  State<ReservationPage> createState() => _ReservationPageState();
 }
 
-class _ReservationDashboardState extends State<ReservationDashboard> with SingleTickerProviderStateMixin {
+class _ReservationPageState extends State<ReservationPage> with SingleTickerProviderStateMixin {
   final ReservationController reservController = Get.put(ReservationController());
   final Color accentColor = const Color.fromARGB(255, 226, 176, 158);
 
@@ -31,7 +31,7 @@ class _ReservationDashboardState extends State<ReservationDashboard> with Single
     };
 
     if (tableId == null || data.values.any((v) => v == null)) {
-      Get.snackbar("Error", "Please fill in all fields correctly.", backgroundColor: Colors.redAccent);
+      Get.snackbar("خطأ", "يرجى ملء جميع الحقول بشكل صحيح", backgroundColor: Colors.redAccent);
       return;
     }
 
@@ -43,7 +43,7 @@ class _ReservationDashboardState extends State<ReservationDashboard> with Single
     if (tableId != null) {
       reservController.fetchTableReservations(tableId);
     } else {
-      Get.snackbar("Error", "Please enter a valid table ID.", backgroundColor: Colors.redAccent);
+      Get.snackbar("خطأ", "يرجى إدخال رقم طاولة صالح", backgroundColor: Colors.redAccent);
     }
   }
 
@@ -52,7 +52,10 @@ class _ReservationDashboardState extends State<ReservationDashboard> with Single
       child: TextField(
         controller: controller,
         keyboardType: TextInputType.number,
-        decoration: InputDecoration(labelText: label, border: OutlineInputBorder()),
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
       ),
     );
   }
@@ -65,18 +68,17 @@ class _ReservationDashboardState extends State<ReservationDashboard> with Single
         backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: accentColor,
-          title: const Text("Reservation System"),
+          title: const Text("نظام الحجوزات"),
           centerTitle: true,
           bottom: const TabBar(
             tabs: [
-              Tab(text: "Current Reservations"),
-              Tab(text: "New Reservation"),
+              Tab(text: "الحجوزات الحالية"),
+              Tab(text: "إجراء حجز جديد"),
             ],
           ),
         ),
         body: TabBarView(
           children: [
-            // Tab 1: Display Reservations
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -84,12 +86,15 @@ class _ReservationDashboardState extends State<ReservationDashboard> with Single
                   TextField(
                     controller: tableIdController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: "Enter Table ID", border: OutlineInputBorder()),
+                    decoration: const InputDecoration(
+                      labelText: "رقم الطاولة",
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton(
                     onPressed: loadReservations,
-                    child: const Text("Load Reservations"),
+                    child: const Text("تحميل الحجوزات"),
                     style: ElevatedButton.styleFrom(backgroundColor: accentColor),
                   ),
                   const SizedBox(height: 16),
@@ -98,28 +103,25 @@ class _ReservationDashboardState extends State<ReservationDashboard> with Single
                       if (reservController.isLoading.value) {
                         return const Center(child: CircularProgressIndicator());
                       }
-                      if (reservController.tables.isEmpty) {
-                        return const Center(child: Text("No current reservations."));
+                      if (reservController.reservations.isEmpty) {
+                        return const Center(child: Text("لا توجد حجوزات حالية."));
                       }
 
                       return ListView.builder(
-                        itemCount: reservController.tables.length,
+                        itemCount: reservController.reservations.length,
                         itemBuilder: (context, index) {
-                          final table = reservController.tables[index];
-                          final startTime = table['start_time'] ?? 'N/A';
-                          final endTime = table['end_time'] ?? 'N/A';
-
+                          final reservation = reservController.reservations[index];
                           return Card(
                             margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                             color: accentColor.withOpacity(0.1),
                             child: ListTile(
                               leading: Icon(Icons.event_seat, color: accentColor),
-                              title: Text("Reservation #${index + 1}", style: const TextStyle(fontWeight: FontWeight.bold)),
+                              title: Text("حجز رقم ${index + 1}", style: const TextStyle(fontWeight: FontWeight.bold)),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("From: $startTime"),
-                                  Text("To:   $endTime"),
+                                  Text("من: ${reservation.startTime}"),
+                                  Text("إلى: ${reservation.endTime}"),
                                 ],
                               ),
                             ),
@@ -132,7 +134,6 @@ class _ReservationDashboardState extends State<ReservationDashboard> with Single
               ),
             ),
 
-            // Tab 2: Make Reservation
             SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -140,32 +141,35 @@ class _ReservationDashboardState extends State<ReservationDashboard> with Single
                   TextField(
                     controller: tableIdController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: "Table ID", border: OutlineInputBorder()),
+                    decoration: const InputDecoration(
+                      labelText: "رقم الطاولة",
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                   const SizedBox(height: 20),
-                  const Text("Start Time", style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text("وقت البدء", style: TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
                   Row(children: [
-                    buildTimeInput("Day", startDay),
+                    buildTimeInput("اليوم", startDay),
                     const SizedBox(width: 8),
-                    buildTimeInput("Hour", startHour),
+                    buildTimeInput("الساعة", startHour),
                     const SizedBox(width: 8),
-                    buildTimeInput("Minute", startMinute),
+                    buildTimeInput("الدقيقة", startMinute),
                   ]),
                   const SizedBox(height: 20),
-                  const Text("End Time", style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text("وقت الانتهاء", style: TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
                   Row(children: [
-                    buildTimeInput("Day", endDay),
+                    buildTimeInput("اليوم", endDay),
                     const SizedBox(width: 8),
-                    buildTimeInput("Hour", endHour),
+                    buildTimeInput("الساعة", endHour),
                     const SizedBox(width: 8),
-                    buildTimeInput("Minute", endMinute),
+                    buildTimeInput("الدقيقة", endMinute),
                   ]),
                   const SizedBox(height: 30),
                   ElevatedButton(
                     onPressed: submitReservation,
-                    child: const Text("Confirm Reservation"),
+                    child: const Text("تأكيد الحجز"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: accentColor,
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
