@@ -34,8 +34,8 @@ Welcome to my restaurant app — a full-featured mobile interface connected to a
 
 - **Offers & Discounts**  
  ## Display current promotions and discounted meals to boost engagement.
- ** Refactored project folder structure for better scalability and maintainability.
-**Replaced the flat structure (screen, api_service) with a layered architecture:
+- ** Refactored project folder structure for better scalability and maintainability.
+- ** Replaced the flat structure (screen, api_service) with a layered architecture:
 - Controller: manages logic and state
 - Service: handles API communication
 - Model: defines data structures
