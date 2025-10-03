@@ -7,20 +7,29 @@ class FavoritePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final accentColor = theme.primaryColor;
+    final backgroundColor = theme.scaffoldBackgroundColor;
+    final cardColor = theme.cardColor;
+    final textColor = theme.textTheme.bodyMedium?.color ?? Colors.black;
+
     favoriteController.fetchFavorites();
 
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: const Text("المفضلة", style: TextStyle(fontSize: 24)),
-        backgroundColor: const Color(0xFFE2B09E),
+        title: Text("Favorite", style: theme.textTheme.titleLarge?.copyWith(fontSize: 24, color: Colors.white)),
+        backgroundColor: accentColor,
         centerTitle: true,
         elevation: 4,
       ),
       body: Obx(() {
         if (favoriteController.favoriteItems.isEmpty) {
-          return const Center(
-            child: Text("لا توجد عناصر مفضلة",
-                style: TextStyle(fontSize: 20, color: Colors.grey)),
+          return Center(
+            child: Text(
+              "No favorites yet",
+              style: theme.textTheme.bodyMedium?.copyWith(fontSize: 20, color: Colors.grey),
+            ),
           );
         }
 
@@ -34,17 +43,19 @@ class FavoritePage extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF6E7E0),
+                color: cardColor,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
-                  BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
+                  BoxShadow(color: Colors.black12, blurRadius: 6, offset: const Offset(0, 3)),
                 ],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Meal ID: ${item.foodId}",
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(
+                    "Meal ID: ${item.foodId}",
+                    style: theme.textTheme.bodyMedium?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                   IconButton(
                     icon: const Icon(Icons.delete, color: Colors.redAccent),
                     onPressed: () {

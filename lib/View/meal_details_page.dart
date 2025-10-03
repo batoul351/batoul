@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import '../Controller/meal_controller.dart';
+
 class MealDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> meal;
 
@@ -17,6 +18,13 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final accentColor = theme.primaryColor;
+    final backgroundColor = theme.scaffoldBackgroundColor;
+    final textColor = theme.textTheme.bodyMedium?.color ?? Colors.black;
+    final subtitleColor = theme.textTheme.bodySmall?.color ?? Colors.grey;
+    final cardColor = theme.cardColor;
+
     final meal = widget.meal;
     final bool hasDiscount = meal['price_reductions'] == "yes";
     final double price = (meal['price'] as num?)?.toDouble() ?? 0.0;
@@ -26,18 +34,19 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
         : null;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: backgroundColor,
       appBar: AppBar(
+        backgroundColor: accentColor,
+        elevation: 0,
+        centerTitle: true,
         title: Text(
           meal['name'] ?? 'Meal Details',
-          style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Color.fromARGB(255, 235, 200, 190)),
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        elevation: 0,
       ),
       body: Column(
         children: [
@@ -52,72 +61,76 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                   )
                 : Container(
                     height: 250,
-                    color: Colors.grey.shade300,
+                    color: cardColor,
                     child: Center(
-                        child: Icon(Icons.fastfood,
-                            size: 80, color: Colors.grey)),
+                      child: Icon(Icons.fastfood, size: 80, color: accentColor),
+                    ),
                   ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _buildSectionTitle("Description:"),
+                  _buildSectionTitle(context, "Description:"),
                   Text(
                     meal['describe'] ?? 'No description available',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    style: TextStyle(fontSize: 16, color: subtitleColor),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
 
-                  _buildSectionTitle("Price:"),
+                  _buildSectionTitle(context, "Price:"),
                   hasDiscount
                       ? Column(
                           children: [
                             Text(
                               "Before Discount: $originalPrice SYP",
                               style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey,
-                                  decoration: TextDecoration.lineThrough),
+                                fontSize: 16,
+                                color: subtitleColor,
+                                decoration: TextDecoration.lineThrough,
+                              ),
                               textAlign: TextAlign.center,
                             ),
                             Text(
                               "Now: ${price.toStringAsFixed(1)} SYP",
                               style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.green,
-                                  fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
                               textAlign: TextAlign.center,
                             ),
                             Text(
                               "Discount: $discountRate%",
                               style: TextStyle(
-                                  fontSize: 14, color: Colors.orangeAccent),
+                                fontSize: 14,
+                                color: Colors.orangeAccent,
+                              ),
                               textAlign: TextAlign.center,
                             ),
                           ],
                         )
                       : Text(
                           "$price SYP",
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                          style: TextStyle(fontSize: 16, color: subtitleColor),
                           textAlign: TextAlign.center,
                         ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
 
-                  _buildSectionTitle("Available Quantity:"),
+                  _buildSectionTitle(context, "Available Quantity:"),
                   Text(
                     "${meal['amounts']}",
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    style: TextStyle(fontSize: 16, color: subtitleColor),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                  _buildSectionTitle("Rate this meal:"),
-                  SizedBox(height: 8),
+                  _buildSectionTitle(context, "Rate this meal:"),
+                  const SizedBox(height: 8),
                   RatingBar.builder(
                     initialRating: 0,
                     minRating: 1,
@@ -125,23 +138,19 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                     itemSize: 35,
                     direction: Axis.horizontal,
                     allowHalfRating: false,
-                    unratedColor: Colors.grey.shade300,
-                    itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                    itemBuilder: (context, _) => Icon(
-                      Icons.star,
-                      color: Color.fromARGB(255, 235, 200, 190),
-                    ),
+                    unratedColor: cardColor,
+                    itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    itemBuilder: (context, _) => Icon(Icons.star, color: accentColor),
                     onRatingUpdate: (rating) {
                       selectedRating = rating;
                     },
                   ),
-                  SizedBox(height: 15),
+                  const SizedBox(height: 15),
 
                   ElevatedButton(
                     onPressed: () {
                       if (selectedRating == 0) {
-                        Get.snackbar("Rating Required",
-                            "Please select at least one star.",
+                        Get.snackbar("Rating Required", "Please select at least one star.",
                             backgroundColor: Colors.orange);
                       } else {
                         mealController.submitRating(
@@ -151,19 +160,16 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 235, 200, 190),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 50, vertical: 12),
+                      backgroundColor: accentColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       "Submit Rating",
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
@@ -175,13 +181,14 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    final accentColor = Theme.of(context).primaryColor;
     return Text(
       title,
       style: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,
-        color: Color.fromARGB(255, 235, 200, 190),
+        color: accentColor,
       ),
     );
   }

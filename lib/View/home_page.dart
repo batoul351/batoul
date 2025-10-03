@@ -2,21 +2,24 @@ import 'package:flutter/material.dart';
 import '../../Controller/home_controller.dart';
 
 class HomePage extends StatelessWidget {
-  final baseColor = const Color.fromARGB(255, 226, 176, 158);
   final HomeController controller = HomeController();
 
   @override
   Widget build(BuildContext context) {
+    final accentColor = Theme.of(context).primaryColor;
+    final textColor = Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black;
+
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
             _buildTopImage(),
             const SizedBox(height: 16),
-            _buildWelcomeText(),
-            _buildWelcomeMessage(),
+            _buildWelcomeText(context),
+            _buildWelcomeMessage(context),
             const SizedBox(height: 12),
-            controller.buildButtons(context, baseColor),
+            controller.buildButtons(context, accentColor),
           ],
         ),
       ),
@@ -47,26 +50,25 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildWelcomeText() {
-    return const Text(
+  Widget _buildWelcomeText(BuildContext context) {
+    final titleStyle = Theme.of(context).textTheme.titleLarge ??
+        const TextStyle(fontSize: 32, fontWeight: FontWeight.bold);
+
+    return Text(
       "WELCOME",
-      style: TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 32,
-        color: Colors.black,
-      ),
+      style: titleStyle.copyWith(fontSize: 32),
     );
   }
 
-  Widget _buildWelcomeMessage() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 6),
+  Widget _buildWelcomeMessage(BuildContext context) {
+    final bodyStyle = Theme.of(context).textTheme.bodyMedium ??
+        const TextStyle(fontSize: 16);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 6),
       child: Text(
         "Welcome to our restaurant! Enjoy your meal",
-        style: TextStyle(
-          color: Colors.black54,
-          fontSize: 16,
-        ),
+        style: bodyStyle.copyWith(fontSize: 16),
         textAlign: TextAlign.center,
       ),
     );

@@ -16,7 +16,7 @@ class ProfileModel {
       city: json['city'] ?? '',
       street: json['street'] ?? '',
       phone: json['phone'].toString(),
-      image: "http://192.168.1.105:8000/" + (json['image'] ?? ''),
+      image: "http://192.168.1.102:8000/" + (json['image'] ?? ''),
     );
   }
 

@@ -9,7 +9,6 @@ class ReservationPage extends StatefulWidget {
 
 class _ReservationPageState extends State<ReservationPage> with SingleTickerProviderStateMixin {
   final ReservationController reservController = Get.put(ReservationController());
-  final Color accentColor = const Color.fromARGB(255, 226, 176, 158);
 
   final tableIdController = TextEditingController();
   final startDay = TextEditingController();
@@ -31,7 +30,7 @@ class _ReservationPageState extends State<ReservationPage> with SingleTickerProv
     };
 
     if (tableId == null || data.values.any((v) => v == null)) {
-      Get.snackbar("خطأ", "يرجى ملء جميع الحقول بشكل صحيح", backgroundColor: Colors.redAccent);
+      Get.snackbar("Error", "Please fill in all fields correctly", backgroundColor: Colors.redAccent);
       return;
     }
 
@@ -43,7 +42,7 @@ class _ReservationPageState extends State<ReservationPage> with SingleTickerProv
     if (tableId != null) {
       reservController.fetchTableReservations(tableId);
     } else {
-      Get.snackbar("خطأ", "يرجى إدخال رقم طاولة صالح", backgroundColor: Colors.redAccent);
+      Get.snackbar("Error", "Please enter a valid table number", backgroundColor: Colors.redAccent);
     }
   }
 
@@ -62,18 +61,26 @@ class _ReservationPageState extends State<ReservationPage> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final accentColor = theme.primaryColor;
+    final backgroundColor = theme.scaffoldBackgroundColor;
+    final cardColor = theme.cardColor;
+    final textColor = theme.textTheme.bodyMedium?.color ?? Colors.black;
+
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: backgroundColor,
         appBar: AppBar(
           backgroundColor: accentColor,
-          title: const Text("نظام الحجوزات"),
+          title: Text("Reservation System", style: theme.textTheme.titleLarge?.copyWith(color: Colors.white)),
           centerTitle: true,
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: "الحجوزات الحالية"),
-              Tab(text: "إجراء حجز جديد"),
+          bottom: TabBar(
+            labelColor: Colors.white,
+            indicatorColor: Colors.white,
+            tabs: const [
+              Tab(text: "Current Reservations"),
+              Tab(text: "Make a New Reservation"),
             ],
           ),
         ),
@@ -87,15 +94,18 @@ class _ReservationPageState extends State<ReservationPage> with SingleTickerProv
                     controller: tableIdController,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
-                      labelText: "رقم الطاولة",
+                      labelText: "Table Number",
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton(
                     onPressed: loadReservations,
-                    child: const Text("تحميل الحجوزات"),
-                    style: ElevatedButton.styleFrom(backgroundColor: accentColor),
+                    child: const Text("Load Reservations"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: accentColor,
+                      foregroundColor: Colors.white,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Expanded(
@@ -104,7 +114,9 @@ class _ReservationPageState extends State<ReservationPage> with SingleTickerProv
                         return const Center(child: CircularProgressIndicator());
                       }
                       if (reservController.reservations.isEmpty) {
-                        return const Center(child: Text("لا توجد حجوزات حالية."));
+                        return Center(
+                          child: Text("No current reservations.", style: theme.textTheme.bodyMedium),
+                        );
                       }
 
                       return ListView.builder(
@@ -113,15 +125,15 @@ class _ReservationPageState extends State<ReservationPage> with SingleTickerProv
                           final reservation = reservController.reservations[index];
                           return Card(
                             margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                            color: accentColor.withOpacity(0.1),
+                            color: cardColor,
                             child: ListTile(
                               leading: Icon(Icons.event_seat, color: accentColor),
-                              title: Text("حجز رقم ${index + 1}", style: const TextStyle(fontWeight: FontWeight.bold)),
+                              title: Text("Reservation #${index + 1}", style: theme.textTheme.titleLarge),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("من: ${reservation.startTime}"),
-                                  Text("إلى: ${reservation.endTime}"),
+                                  Text("From: ${reservation.startTime}", style: theme.textTheme.bodyMedium),
+                                  Text("To: ${reservation.endTime}", style: theme.textTheme.bodyMedium),
                                 ],
                               ),
                             ),
@@ -142,36 +154,37 @@ class _ReservationPageState extends State<ReservationPage> with SingleTickerProv
                     controller: tableIdController,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
-                      labelText: "رقم الطاولة",
+                      labelText: "Table Number",
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Text("وقت البدء", style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text("Start Time", style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
                   Row(children: [
-                    buildTimeInput("اليوم", startDay),
+                    buildTimeInput("Day", startDay),
                     const SizedBox(width: 8),
-                    buildTimeInput("الساعة", startHour),
+                    buildTimeInput("Hour", startHour),
                     const SizedBox(width: 8),
-                    buildTimeInput("الدقيقة", startMinute),
+                    buildTimeInput("Minute", startMinute),
                   ]),
                   const SizedBox(height: 20),
-                  const Text("وقت الانتهاء", style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text("End Time", style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
                   Row(children: [
-                    buildTimeInput("اليوم", endDay),
+                    buildTimeInput("Day", endDay),
                     const SizedBox(width: 8),
-                    buildTimeInput("الساعة", endHour),
+                    buildTimeInput("Hour", endHour),
                     const SizedBox(width: 8),
-                    buildTimeInput("الدقيقة", endMinute),
+                    buildTimeInput("Minute", endMinute),
                   ]),
                   const SizedBox(height: 30),
                   ElevatedButton(
                     onPressed: submitReservation,
-                    child: const Text("تأكيد الحجز"),
+                    child: const Text("Confirm Reservation"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: accentColor,
+                      foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                     ),
                   ),

@@ -1,10 +1,9 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter/material.dart';
-import 'package:dio/dio.dart'as dio;
-import '../Model/profile_model.dart';
-import '../Service/profile_service.dart';
+import 'package:dio/dio.dart' as dio;
+import '../service/profile_service.dart';
 
 class ProfileController extends GetxController {
   final cityController = TextEditingController();
@@ -26,7 +25,6 @@ class ProfileController extends GetxController {
   void pickImage() async {
     final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (picked != null) {
-      imagePath.value = picked.path;
       imageFile.value = File(picked.path);
     }
   }
@@ -37,48 +35,55 @@ class ProfileController extends GetxController {
       return;
     }
 
+    final token = service.getToken();
+    if (token == null || token.isEmpty) {
+      Get.snackbar('توكن مفقود', 'يرجى تسجيل الدخول أولاً');
+      return;
+    }
+
     if (imageFile.value == null || !await imageFile.value!.exists()) {
       Get.snackbar('الصورة مطلوبة', 'يرجى اختيار صورة صالحة قبل الإرسال');
       return;
     }
 
-    final formData = dio.FormData.fromMap({
-  'city': cityController.text,
-  'street': streetController.text,
-  'phone': phoneController.text,
-  'image': await dio.MultipartFile.fromFile(
-    imageFile.value!.path,
-    filename: imageFile.value!.path.split('/').last,
-  ),
-});
+    try {
+      final formData = dio.FormData.fromMap({
+        'city': cityController.text,
+        'street': streetController.text,
+        'phone': phoneController.text,
+        'image': await dio.MultipartFile.fromFile(
+          imageFile.value!.path,
+          filename: imageFile.value!.path.split('/').last,
+        ),
+      });
 
+      final response = await service.submitProfile(formData);
 
-    final response = await service.submitProfile(formData);
-
-    if (response == null) {
-      Get.snackbar('خطأ', 'فشل الاتصال بالسيرفر');
-    } else if (response.statusCode == 200) {
-      Get.snackbar('نجاح', 'تم إنشاء الملف الشخصي بنجاح');
-      fetchProfile();
-    } else if (response.statusCode == 409) {
-      hasProfile.value = true;
-      Get.snackbar('موجود مسبقًا', 'الملف الشخصي موجود بالفعل');
-    } else {
-      Get.snackbar('فشل', 'تعذر إنشاء الملف الشخصي: ${response.statusCode}');
+      if (response?.statusCode == 200) {
+        Get.snackbar('نجاح', 'تم إنشاء الملف الشخصي بنجاح');
+        fetchProfile();
+      } else if (response?.statusCode == 409) {
+        hasProfile.value = true;
+        Get.snackbar('موجود مسبقًا', 'الملف الشخصي موجود بالفعل');
+      } else {
+        Get.snackbar('فشل', 'تعذر إنشاء الملف الشخصي: ${response?.statusCode}');
+      }
+    } catch (e) {
+      Get.snackbar('خطأ', 'حدث خطأ أثناء إرسال البيانات: $e');
     }
   }
 
   Future<void> fetchProfile() async {
     final response = await service.fetchProfile();
 
-    if (response != null && response.statusCode == 200) {
-      final data = response.data;
+    if (response?.statusCode == 200) {
+      final data = response!.data;
       if (data['message'] != null && data['message'].isNotEmpty) {
-        final profile = ProfileModel.fromJson(data['message'][0]);
-        cityController.text = profile.city;
-        streetController.text = profile.street;
-        phoneController.text = profile.phone;
-        imagePath.value = profile.image;
+        final profile = data['message'][0];
+        cityController.text = profile['city']?.toString() ?? '';
+        streetController.text = profile['street']?.toString() ?? '';
+        phoneController.text = profile['phone']?.toString() ?? '';
+        imagePath.value = 'http://192.168.1.102:8000/' + profile['image'];
         imageFile.value = null;
         hasProfile.value = true;
       }

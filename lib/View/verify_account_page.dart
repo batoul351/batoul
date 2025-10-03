@@ -11,13 +11,18 @@ class VerifyAccountPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final accentColor = theme.primaryColor;
+    final backgroundColor = theme.scaffoldBackgroundColor;
+    final textColor = theme.textTheme.bodyMedium?.color ?? Colors.black;
+
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 235, 200, 190),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 235, 200, 190),
+        backgroundColor: backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: Icon(Icons.arrow_back_ios, color: accentColor),
           onPressed: () => Get.back(),
         ),
       ),
@@ -26,9 +31,9 @@ class VerifyAccountPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.verified, color: Colors.white, size: MediaQuery.of(context).size.height * 0.1),
+            Icon(Icons.verified, color: accentColor, size: MediaQuery.of(context).size.height * 0.1),
             const SizedBox(height: 20),
-            const Text("Verify Account", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white)),
+            Text("Verify Account", style: theme.textTheme.titleLarge?.copyWith(fontSize: 30, fontWeight: FontWeight.bold, color: accentColor)),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -41,12 +46,12 @@ class VerifyAccountPage extends StatelessWidget {
                     keyboardType: TextInputType.number,
                     textAlign: TextAlign.center,
                     maxLength: 1,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       counterText: "",
-                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
-                      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 2)),
+                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: accentColor)),
+                      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: accentColor, width: 2)),
                     ),
-                    style: const TextStyle(fontSize: 24, color: Colors.white),
+                    style: TextStyle(fontSize: 24, color: accentColor),
                   ),
                 ),
               ),
@@ -63,12 +68,18 @@ class VerifyAccountPage extends StatelessWidget {
                         Get.snackbar("Error", "Please enter a 6-digit verification code", backgroundColor: Colors.orange);
                       }
                     },
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50), side: const BorderSide(color: Colors.white)),
-                    child: const Text("Verify", style: TextStyle(color: Color.fromARGB(255, 235, 200, 190), fontSize: 18, fontWeight: FontWeight.bold)),
+                    color: backgroundColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
+                      side: BorderSide(color: accentColor),
+                    ),
+                    child: Text("Verify", style: TextStyle(color: accentColor, fontSize: 18, fontWeight: FontWeight.bold)),
                   )),
             const SizedBox(height: 20),
-            Obx(() => Text(verifyController.verificationMessage.value, style: const TextStyle(color: Colors.red))),
+            Obx(() => Text(
+              verifyController.verificationMessage.value,
+              style: const TextStyle(color: Colors.red),
+            )),
           ],
         ),
       ),

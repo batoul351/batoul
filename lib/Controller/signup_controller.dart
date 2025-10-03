@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../../Service/signup_service.dart';
-import '../View/category_page.dart'; 
+import '../View/verify_account_page.dart'; 
 import 'package:flutter/material.dart';
 class SignUpController extends GetxController {
   var isLoading = false.obs;
@@ -35,7 +35,8 @@ class SignUpController extends GetxController {
 
       Get.snackbar("نجاح", signUpMessage.value, backgroundColor: Get.theme.primaryColor);
 
-      Get.offAll(() => WelcomePage());
+        Get.to(() => VerifyAccountPage(email: email));
+
     } else {
       signUpMessage.value = response['message'] ?? "خطأ غير معروف";
       Get.snackbar("خطأ", signUpMessage.value, backgroundColor: Colors.red);

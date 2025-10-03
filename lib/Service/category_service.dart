@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:get_storage/get_storage.dart';
 
 class CategoryService {
-  static const String baseUrl = "http://192.168.1.105:8000/api";
+  static const String baseUrl = "http://192.168.1.102:8000/api";
   static const String endpoint = "/getParts";
   final Dio dio = Dio();
   final box = GetStorage();

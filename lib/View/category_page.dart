@@ -4,9 +4,10 @@ import 'package:url_launcher/url_launcher.dart';
 import '../Controller/category_controller.dart';
 import '../Model/category_model.dart';
 import 'meals_page.dart';
-import 'profile_page.dart';
+import 'settings_page.dart';
 import 'favorite_page.dart';
 import 'reservation_page.dart';
+import '../Controller/style_helper.dart'; 
 
 class WelcomePage extends StatefulWidget {
   @override
@@ -28,14 +29,16 @@ class _WelcomePageState extends State<WelcomePage> {
     if (await canLaunchUrl(phoneUri)) {
       await launchUrl(phoneUri);
     } else {
-      Get.snackbar("خطأ", " لا يمكن إجراء المكالمة", backgroundColor: Colors.red);
+      Get.snackbar("خطأ", " لا يمكن إجراء المكالمة",
+          backgroundColor: Colors.red,
+          colorText: Colors.white);
     }
   }
 
   void _onItemTapped(int index) {
     switch (index) {
       case 1:
-        Get.to(() => ProfilePage());
+        Get.to(() => SettingsPage());
         break;
       case 2:
         Get.to(() => FavoritePage());
@@ -53,17 +56,15 @@ class _WelcomePageState extends State<WelcomePage> {
   Widget buildCategoryItem(CategoryModel category) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      color: Colors.white,
+      color: getCardColor(context),
       elevation: 4,
       child: ListTile(
-        leading: const Icon(Icons.restaurant_menu,
-            color: Color.fromARGB(255, 226, 176, 158), size: 30),
+        leading: Icon(Icons.restaurant_menu, color: getAccent(context), size: 30),
         title: Text(
           category.name,
-          style: const TextStyle(
-              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+          style: getTitleStyle(context).copyWith(fontSize: 18),
         ),
-        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 18),
+        trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 18),
         onTap: () => Get.to(() => MealsPage(
             categoryId: category.id, categoryName: category.name)),
       ),
@@ -73,16 +74,15 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: getBackground(context),
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 226, 176, 158),
+        backgroundColor: getAccent(context),
         elevation: 0,
-        title: const Text(
+        title: Text(
           "Food Categories",
-          style: TextStyle(
-            color: Colors.white,
+          style: getTitleStyle(context).copyWith(
+            color: getAppBarTextColor(context),
             fontSize: 22,
-            fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
@@ -107,7 +107,9 @@ class _WelcomePageState extends State<WelcomePage> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (categoryController.categories.isEmpty) {
-                  return const Center(child: Text("لا توجد فئات متاحة."));
+                  return Center(
+                    child: Text("لا توجد فئات متاحة.", style: getBodyStyle(context)),
+                  );
                 }
                 return ListView.builder(
                   itemCount: categoryController.categories.length,
@@ -135,11 +137,11 @@ class _WelcomePageState extends State<WelcomePage> {
           BottomNavigationBarItem(icon: Icon(Icons.favorite), label: "Favorites"),
           BottomNavigationBarItem(icon: Icon(Icons.notifications), label: "Notifications"),
           BottomNavigationBarItem(icon: Icon(Icons.event_seat), label: "Bookings"),
-
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blueAccent,
         unselectedItemColor: Colors.grey,
+        backgroundColor: getBackground(context),
         onTap: _onItemTapped,
       ),
     );

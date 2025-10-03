@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import '../Model/verification_response_model.dart';
 
 class VerifyAccountService {
-  static const String baseUrl = "http://192.168.1.105:8000/api";
+  static const String baseUrl = "http://192.168.1.102:8000/api";
   static const String endpoint = "/verification_signup";
 
   static Future<VerificationResponseModel> verifyAccount({

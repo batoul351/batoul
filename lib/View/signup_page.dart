@@ -12,13 +12,18 @@ class SignUpPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final accentColor = theme.primaryColor;
+    final backgroundColor = theme.scaffoldBackgroundColor;
+    final textColor = theme.textTheme.bodyMedium?.color ?? Colors.black;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color.fromARGB(255, 228, 184, 168)),
+          icon: Icon(Icons.arrow_back_ios, color: accentColor),
           onPressed: () => Get.back(),
         ),
       ),
@@ -27,14 +32,14 @@ class SignUpPage extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            const Icon(Icons.restaurant_menu, color: Color.fromARGB(255, 228, 184, 168), size: 50),
+            Icon(Icons.restaurant_menu, color: accentColor, size: 50),
             const SizedBox(height: 20),
-            const Text("Sign Up", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 228, 184, 168))),
+            Text("Sign Up", style: theme.textTheme.titleLarge?.copyWith(fontSize: 30, fontWeight: FontWeight.bold, color: accentColor)),
             const SizedBox(height: 20),
-            buildTextField("First Name", firstNameController),
-            buildTextField("Last Name", lastNameController),
-            buildTextField("Email", emailController),
-            buildTextField("Password", passwordController, obscureText: true),
+            buildTextField(context, "First Name", firstNameController),
+            buildTextField(context, "Last Name", lastNameController),
+            buildTextField(context, "Email", emailController),
+            buildTextField(context, "Password", passwordController, obscureText: true),
             const SizedBox(height: 20),
             Obx(() => signUpController.isLoading.value
                 ? const CircularProgressIndicator()
@@ -47,9 +52,12 @@ class SignUpPage extends StatelessWidget {
                         password: passwordController.text.trim(),
                       );
                     },
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50), side: const BorderSide(color: Color.fromARGB(255, 228, 184, 168))),
-                    child: const Text("Sign Up", style: TextStyle(color: Color.fromARGB(255, 228, 184, 168), fontSize: 18, fontWeight: FontWeight.bold)),
+                    color: backgroundColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
+                      side: BorderSide(color: accentColor),
+                    ),
+                    child: Text("Sign Up", style: TextStyle(color: accentColor, fontSize: 18, fontWeight: FontWeight.bold)),
                   )),
             const SizedBox(height: 20),
             Obx(() => Text(signUpController.signUpMessage.value, style: const TextStyle(color: Colors.red))),
@@ -59,7 +67,9 @@ class SignUpPage extends StatelessWidget {
     );
   }
 
-  Widget buildTextField(String label, TextEditingController controller, {bool obscureText = false}) {
+  Widget buildTextField(BuildContext context, String label, TextEditingController controller, {bool obscureText = false}) {
+    final accentColor = Theme.of(context).primaryColor;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: TextField(
@@ -67,9 +77,9 @@ class SignUpPage extends StatelessWidget {
         obscureText: obscureText,
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: const TextStyle(color: Color.fromARGB(255, 228, 184, 168)),
-          enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Color.fromARGB(255, 228, 184, 168))),
-          focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: Color.fromARGB(255, 228, 184, 168), width: 2)),
+          labelStyle: TextStyle(color: accentColor),
+          enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: accentColor)),
+          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: accentColor, width: 2)),
         ),
       ),
     );

@@ -8,7 +8,7 @@ import 'meal_details_page.dart';
 class MealsPage extends StatelessWidget {
   final int categoryId;
   final String categoryName;
-  
+
   final MealController mealController = Get.put(MealController());
   final FavoriteController favoriteController = Get.put(FavoriteController());
 
@@ -16,13 +16,24 @@ class MealsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final accentColor = theme.primaryColor;
+    final backgroundColor = theme.scaffoldBackgroundColor;
+    final cardColor = theme.cardColor;
+    final textColor = theme.textTheme.bodyMedium?.color ?? Colors.white;
+    final subtitleColor = theme.textTheme.bodySmall?.color ?? Colors.white70;
+
     mealController.fetchMealsByCategory(categoryId);
 
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: Text("Meals - $categoryName",
-            style: const TextStyle(fontSize: 24, color: Colors.white)),
-        backgroundColor: const Color.fromARGB(255, 226, 176, 158),
+        backgroundColor: accentColor,
+        title: Text(
+          "Meals - $categoryName",
+          style: theme.textTheme.titleLarge?.copyWith(color: Colors.white, fontSize: 24),
+        ),
+        centerTitle: true,
       ),
       body: Obx(() {
         if (mealController.isLoading.value) {
@@ -30,9 +41,11 @@ class MealsPage extends StatelessWidget {
         }
 
         if (mealController.meals.isEmpty) {
-          return const Center(
-            child: Text(" لا توجد وجبات متاحة",
-                style: TextStyle(fontSize: 20, color: Colors.red)),
+          return Center(
+            child: Text(
+              "لا توجد وجبات متاحة",
+              style: theme.textTheme.titleMedium?.copyWith(color: Colors.red, fontSize: 20),
+            ),
           );
         }
 
@@ -42,8 +55,10 @@ class MealsPage extends StatelessWidget {
             final meal = mealController.meals[index];
 
             return Card(
-              color: const Color.fromARGB(255, 226, 176, 158),
+              color: cardColor,
               margin: const EdgeInsets.all(8),
+              elevation: 3,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: ListTile(
                 leading: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
@@ -52,30 +67,33 @@ class MealsPage extends StatelessWidget {
                     width: 80,
                     height: 80,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.broken_image,
-                            size: 50, color: Colors.red),
+                    errorBuilder: (context, error, stackTrace) => Icon(
+                      Icons.broken_image,
+                      size: 50,
+                      color: accentColor,
+                    ),
                   ),
                 ),
-                title: Text(meal.name,
-                    style: const TextStyle(fontSize: 20, color: Colors.white)),
+                title: Text(
+                  meal.name,
+                  style: theme.textTheme.titleMedium?.copyWith(fontSize: 20, color: textColor),
+                ),
                 subtitle: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("${meal.price} SYP",
-                        style: const TextStyle(
-                            fontSize: 18, color: Colors.white70)),
+                    Text(
+                      "${meal.price} SYP",
+                      style: theme.textTheme.bodySmall?.copyWith(fontSize: 18, color: subtitleColor),
+                    ),
                     IconButton(
-                      icon: const Icon(Icons.favorite_border,
-                          color: Colors.white),
+                      icon: Icon(Icons.favorite_border, color: accentColor),
                       onPressed: () {
                         favoriteController.addToFavorite(meal.id);
                       },
                     ),
                   ],
                 ),
-onTap: () => Get.to(() => MealDetailsScreen(meal: meal.toJson())),
-
+                onTap: () => Get.to(() => MealDetailsScreen(meal: meal.toJson())),
               ),
             );
           },
