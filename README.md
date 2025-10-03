@@ -1,14 +1,17 @@
 # 🍽️ Restaurant App
 
-Welcome to my restaurant app — a full-featured mobile interface connected to a Laravel backend. Built with **GetX**, **HTTP**, and **SharedPreferences**, this project delivers a smooth and responsive user experience.
+Welcome to my restaurant app — a full-featured mobile interface connected to a Laravel backend. Built with **GetX**, **Dio**, and **GetStorage**, this project delivers a smooth and responsive user experience with modern architecture and clean design.
+
+---
 
 ## 🔧 Technologies Used
-- **GetX** – Efficient state management and navigation across the app.
 
-- **Dio** – Handles API communication with the Laravel backend, offering advanced features like interceptors, custom headers, and robust error handling.
+- **GetX** – Efficient state management, routing, and reactive UI updates.  
+- **Dio** – Powerful HTTP client for API communication with Laravel, supporting interceptors and error handling.  
+- **GetStorage** – Lightweight local storage for persisting user sessions and preferences.
 
-- **GetStorage** – Lightweight and fast local storage solution used to persist user data and session state across app launches.
-  
+---
+
 ## 📱 App Features
 
 - **Email Sign-Up with Verification**  
@@ -16,6 +19,12 @@ Welcome to my restaurant app — a full-featured mobile interface connected to a
 
 - **Login Screen**  
   Secure login with saved credentials and session management.
+
+- **Logout Functionality**  
+  Users can securely log out, with token revocation handled on the backend and automatic redirection to the login screen.
+
+- **Password Reset via Email**  
+  A recovery flow is implemented where users receive a verification code via email to reset their password safely.
 
 - **User Profile**  
   View and edit personal information with real-time updates.
@@ -33,14 +42,22 @@ Welcome to my restaurant app — a full-featured mobile interface connected to a
   One-tap phone call feature to contact the restaurant instantly.
 
 - **Offers & Discounts**  
- ## Display current promotions and discounted meals to boost engagement.
- Refactored project folder structure for better scalability and maintainability.
- 
- Replaced the flat structure (screen, api_service) with a layered architecture:
-- Controller: manages logic and state
-- Service: handles API communication
-- Model: defines data structures
-- View: contains UI screens
+  Display current promotions and discounted meals to boost engagement.
+
+- **Dynamic Theme Support**  
+  The app now supports light and dark modes, with a toggle switch and an option to reset to default theme settings.
+
+---
+
+## 🧱 Project Structure
+
+Refactored project folder structure for better scalability and maintainability.  
+Replaced the flat structure with a layered architecture:
+
+- **Controller** – Manages logic and state.  
+- **Service** – Handles API communication.  
+- **Model** – Defines data structures.  
+- **View** – Contains UI screens.
 
 ---
 
